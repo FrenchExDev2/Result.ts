@@ -1,0 +1,38 @@
+FrenchExDev Educational License v1.0
+Copyright (c) 2026 Stéphane Erard
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to use
+the Software solely for the following EDUCATIONAL PURPOSES:
+
+  - Personal study and learning
+  - Academic research and teaching
+  - Internal evaluation and prototyping (non-revenue-generating)
+  - Open-source contribution back to this project
+
+PRODUCTION USE of the Software is NOT permitted under this license.
+"Production use" includes, without limitation:
+
+  - Use in any commercial product or service offered to third parties
+  - Use as part of an internal business system that supports revenue
+  - Distribution as part of any commercial offering
+  - Software-as-a-Service (SaaS) deployment of the Software or any
+    derivative work
+  - Any use generating direct or indirect financial benefit beyond
+    individual learning
+
+To obtain a separate commercial license enabling production use, contact:
+
+    Stéphane Erard <stephane.erard@gmail.com>
+
+The author may grant production licenses on terms agreed in writing.
+Failure to obtain such a license prior to production use constitutes
+infringement.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
