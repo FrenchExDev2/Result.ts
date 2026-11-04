@@ -1,34 +1,25 @@
 {
-  "name": "@frenchexdev/result",
+  "name": "@frenchexdev2/result-workspace",
   "version": "0.1.0",
-  "description": "Immutable TypeScript results with accumulated validation errors and selectively captured domain exceptions.",
+  "private": true,
   "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "default": "./dist/index.js"
-    }
+  "packageManager": "pnpm@11.20.0",
+  "engines": {
+    "node": ">=22.22"
   },
-  "sideEffects": false,
-  "files": ["dist/**/*.js", "dist/**/*.js.map", "dist/**/*.d.ts", "dist/**/*.d.ts.map", "LICENSE", "README.md"],
-  "engines": { "node": ">=22" },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "typecheck": "tsc -p test/tsconfig.json --noEmit",
-    "test": "vitest run --coverage",
-    "test:watch": "vitest",
-    "test:mutation": "stryker run",
-    "prepack": "pnpm run build && pnpm run typecheck"
-  },
-  "devDependencies": {
-    "@types/node": "catalog:",
-    "@vitest/coverage-v8": "catalog:",
-    "typescript": "catalog:",
-    "vitest": "catalog:"
+    "build": "pnpm -r --workspace-concurrency=1 run build",
+    "typecheck": "pnpm -r run typecheck",
+    "test": "pwsh -NoProfile -File scripts/Invoke-Validation.ps1",
+    "test:mutation": "pwsh -NoProfile -File scripts/Invoke-Validation.ps1 -Phase Mutation",
+    "test:ci": "pnpm run typecheck && pnpm -r run test",
+    "test:release": "node --test test/release.test.mjs",
+    "release:prepare": "node scripts/release.mjs prepare",
+    "release:check": "node scripts/release.mjs check"
   },
   "license": "SEE LICENSE IN LICENSE",
-  "author": "Stéphane Erard <stephane.erard@gmail.com> (https://serard.dev)"
+  "author": "Stéphane Erard <stephane.erard@gmail.com> (https://serard.dev)",
+  "devDependencies": {
+    "@typescript/native": "catalog:"
+  }
 }

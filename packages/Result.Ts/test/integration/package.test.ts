@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { Result, validationError, type ValidationResult } from '@frenchexdev/result';
+import { Result, validationError, type ValidationResult } from '@frenchexdev2/result';
 import { EmailAlreadyRegisteredError, register, validateRegistration } from '../../examples/registration.js';
 
 describe('built ESM package and registration example', () => {

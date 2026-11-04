@@ -6,7 +6,7 @@ import { pathToFileURL } from 'node:url';
 
 const directory = resolve(process.argv[2]);
 const manifest = JSON.parse(await readFile(resolve(directory, 'package.json'), 'utf8'));
-assert.equal(manifest.name, '@frenchexdev/result');
+assert.equal(manifest.name, '@frenchexdev2/result');
 assert.equal(manifest.type, 'module');
 assert.deepEqual(manifest.dependencies ?? {}, {});
 await access(resolve(directory, manifest.exports['.'].types));

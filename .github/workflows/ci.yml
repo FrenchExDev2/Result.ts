@@ -1,0 +1,101 @@
+name: Build, test and publish
+
+on:
+  push:
+    branches: ['**']
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
+
+defaults:
+  run:
+    shell: >-
+      pwsh -NoLogo -NoProfile -Command "$ErrorActionPreference = 'Stop';
+      if ($PSVersionTable.PSVersion -lt [version]'7.6') { throw 'PowerShell 7.6+ is required.' };
+      $utf8 = [System.Text.UTF8Encoding]::new($false);
+      [Console]::InputEncoding = $utf8; [Console]::OutputEncoding = $utf8; $OutputEncoding = $utf8;
+      $PSNativeCommandUseErrorActionPreference = $true; . '{0}'"
+
+jobs:
+  verify:
+    name: Build and test (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          package-manager-cache: false
+      - uses: pnpm/action-setup@v6
+        with:
+          run_install: false
+      - name: Reject local dependency transports
+        run: node scripts/release.mjs check
+      - name: Verify committed release versions
+        if: startsWith(github.ref, 'refs/tags/')
+        run: node scripts/release.mjs check "$env:GITHUB_REF_NAME"
+      - name: Test release tooling
+        run: node --test test/release.test.mjs
+      - name: Install committed dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Build workspace
+        run: pnpm run build
+      - name: Test workspace
+        run: pnpm run test:ci
+
+  publish:
+    permissions:
+      contents: read
+      id-token: write
+    name: Publish workspace to npmjs.org
+    needs: verify
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # Serialize npm releases across tags, including any isolated-package release.
+    concurrency:
+      group: npm-publication
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          package-manager-cache: false
+      - uses: pnpm/action-setup@v6
+        with:
+          run_install: false
+      - name: Verify release and choose npm channel
+        id: release
+        run: node scripts/release.mjs check "$env:GITHUB_REF_NAME"
+      - name: Install committed dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Build workspace
+        run: pnpm run build
+      - name: Configure npm authentication
+        uses: actions/setup-node@v6
+        with:
+          registry-url: https://registry.npmjs.org/
+          package-manager-cache: false
+      - name: Publish public packages
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          DIST_TAG: ${{ steps.release.outputs.dist-tag }}
+        run: |
+          pnpm -r publish --access public --registry https://registry.npmjs.org/ --tag "$env:DIST_TAG" --no-git-checks --ignore-scripts

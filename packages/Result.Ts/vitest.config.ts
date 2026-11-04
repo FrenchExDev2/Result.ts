@@ -1,6 +1,7 @@
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
+  resolve: { conditions: ['source', 'import', 'module', 'node', 'default'] },
   test: {
     environment: 'node',
     include: ['test/unit/**/*.test.ts', 'test/integration/**/*.test.ts'],

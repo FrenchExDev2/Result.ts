@@ -5,7 +5,8 @@ import base from './vitest.config.js';
 /** Mutation tests must import the instrumented sources, including self-imports. */
 export default mergeConfig(base, defineConfig({
   resolve: {
-    alias: { '@frenchexdev/result': fileURLToPath(new URL('./src/index.ts', import.meta.url)) },
+    conditions: ['source', 'import', 'module', 'node', 'default'],
+    alias: { '@frenchexdev2/result': fileURLToPath(new URL('./src/index.ts', import.meta.url)) },
   },
   test: {
     coverage: { enabled: false },
