@@ -131,3 +131,22 @@ test('isolated test support copies source fixtures without adding another instal
   await json('release.config.json', { isolatedPackages: ['kernel'], isolatedTestSources: { kernel: ['../outside'] } });
   await assert.rejects(stageRelease(root, 'kernel/v0.1.0', join(root, 'bad-stage')), /within the workspace/);
 });
+
+test('workflow shell escapes literal braces for the runner format string', async () => {
+  const workflow = await readFile(new URL('../.github/workflows/ci.yml', import.meta.url), 'utf8');
+  const block = /    shell: >-\r?\n((?:      [^\r\n]+\r?\n)+)/.exec(workflow);
+  assert.ok(block, 'Expected the custom folded shell template');
+  const template = block[1].trim().split(/\r?\n/).map(line => line.trim()).join(' ');
+  let placeholders = 0;
+  const formatted = template.replace(/\{\{|\}\}|\{0\}|[{}]/g, token => {
+    if (token === '{0}') {
+      placeholders++;
+      return 'runner-script.ps1';
+    }
+    assert.ok(token === '{{' || token === '}}', `Unescaped shell brace: ${token}`);
+    return token[0];
+  });
+  assert.equal(placeholders, 1, 'The runner must substitute exactly one script path');
+  assert.match(formatted, /if \(\$PSVersionTable\.PSVersion -lt \[version\]'7\.6'\) \{ throw 'PowerShell 7\.6\+ is required\.' \}/);
+  assert.ok(formatted.endsWith(`. 'runner-script.ps1'"`));
+});
